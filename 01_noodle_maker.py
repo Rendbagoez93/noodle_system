@@ -139,7 +139,8 @@ class WaterSystem:
         self.is_valve_open = False
         
     def open_water_valve(self, seconds):
-        water = seconds * 100  # 100 ml per second
+        flow_rate = 100 # ml per second
+        water = seconds * flow_rate 
         self.current_capacity += water
         self.max_capacity_in_tank -= water
     
@@ -149,19 +150,12 @@ class WaterSystem:
         else:
             self.capacity_in_bucket = 0
         
-    def heat_up (self, seconds):
-        self.current_temp += seconds * 5
-        if self.current_temp > 100:
-            self.current_temp = 100
-        else:
-            self.current_temp += seconds * 5
-            
-    def cool_down (self, seconds):
-        self.current_temp -= seconds * 5
-        if self.current_temp < 25:
-            self.current_temp = 25
-        else:
-            self.current_temp -= seconds * 5
+    def heat_up (self, target_temp):
+        seconds_needed = 0
+        while self.current_temp < target_temp:
+            self.current_temp += 5
+            seconds_needed += 1
+        return seconds_needed
     
     def empty_bucket(self):
         self.current_capacity = 0
@@ -190,7 +184,7 @@ class Dispenser:
     def get_dispenser_status(self):
         return f"{self.name} Current Dispenser: {self.current_amount}/{self.capacity} ml remaining"
     
-noodle = Dispenser("Noodle", capacity=50, ml_per_trigger=5)        
+noodle = Dispenser("Noodle", capacity=50, ml_per_trigger=1)        
 ketchup = Dispenser("Ketchup", capacity=1000, ml_per_trigger=1)
 sausage = Dispenser("Sausage", capacity=1000, ml_per_trigger=1)
 powder = Dispenser("Powder", capacity=1000, ml_per_trigger=2)
@@ -280,3 +274,4 @@ print("FINAL MACHINE STATUS")
 for key, value in noodle_machine.get_machine_status().items():
     print(f"{key}: {value}")
 print("=" * 20)
+
