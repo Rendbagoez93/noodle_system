@@ -1,4 +1,5 @@
 import time
+import threading
 
 class WaterSystem:
     def __init__(self):
@@ -72,7 +73,7 @@ class Dispenser:
     def get_dispenser_status(self):
         return f"{self.name} Current Dispenser: {self.current_amount}/{self.capacity} ml remaining"
     
-noodle = Dispenser("Noodle", capacity=100, ml_per_trigger=1)        
+noodle = Dispenser("Noodle", capacity=50, ml_per_trigger=1)        
 ketchup = Dispenser("Ketchup", capacity=1000, ml_per_trigger=1)
 sausage = Dispenser("Sausage", capacity=1000, ml_per_trigger=1)
 powder = Dispenser("Powder", capacity=1000, ml_per_trigger=1)
@@ -92,38 +93,50 @@ powder = Dispenser("Powder", capacity=1000, ml_per_trigger=1)
 
 
 class CookingProcess:   
-    def __init__(self, cooking_time, maintain_temp=83, initial_temp=80, min_temp=75, max_temp=90, tolerance=1.5):
+    def __init__(self, cooking_time, min_temp=70, main_temp=80, critical_temp=90):
         self.cooking_time = cooking_time
-        self.current_temp = initial_temp
-        self.maintain_temp = maintain_temp
-        self.min_temp = min_temp
-        self.max_temp = max_temp
-        self.tolerance = tolerance
+        self.minimal_temp = min_temp
+        self.critical_temp = critical_temp
+        self.maintain_temp = main_temp
+        self.current_temp = 80
+        self.cooking_active = False
 
-    def run_with_temparature_control(self):
+    def run(self): 
         elapsed = 0
+    
         print("Starting Cooking Process...")
-        while self.cooking_time > elapsed:
-            print (f"Cooking... {self.cooking_time - elapsed}s remaining. Current Temp: {self.current_temp}°C")
+        self.cooking_active = True
+        while elapsed < self.cooking_time:
             elapsed += 10
-            self.current_temp += 5
-            self.current_temp = max(self.min_temp, min(self.current_temp, self.max_temp))
-                      
-            if abs(self.current_temp - self.maintain_temp) > self.tolerance:
-                print("Checking temperature...")
-                if self.current_temp < self.maintain_temp - self.tolerance:
-                    self.current_temp += 2.5
-                    print(f"Low Temperature. Heat Up. Current Temp: {self.current_temp}°C")
-                elif self.current_temp > self.maintain_temp + self.tolerance:
-                    self.current_temp -= 5
-                    print(f"High Temperature. Cool Down. Current Temp: {self.current_temp}°C")
-            else:
-                print(f"Stable Temperature (within tolerance). Current Temp: {self.current_temp}°C")
-            
+            print(f"Cooking... {self.cooking_time - elapsed}s remaining.")
             time.sleep(2)
-            
+    
+        self.cooking_active = False
         return "Cooking Process Completed."
 
+    def maintain_temperature(self):
+        while getattr(self, 'cooking_active', True):
+            if self.current_temp < self.minimal_temp:
+                self.current_temp += 2.5
+                print(f"Low Temperature. Heat Up. Current Temp: {self.current_temp}°C")
+            elif self.current_temp > self.critical_temp:
+                self.current_temp -= 2.5
+                print(f"High Temperature. Cool Down. Current Temp: {self.current_temp}°C")
+            else:
+                print(f"Stable Temperature. Current Temp: {self.current_temp}°C")
+            
+            time.sleep(1)  
+
+    def run_with_temperature_control(self):
+        temp_thread = threading.Thread(target=self.maintain_temperature)
+        temp_thread.daemon = True
+        temp_thread.start()
+    
+        result = self.run()
+        temp_thread.join()
+        
+        return result
+    
 # process = CookingProcess()
 # print(process.cooking_process())
 
@@ -136,8 +149,7 @@ class NoodleMachine:
         self.sausage_dispenser = Dispenser("Sausage", capacity=1000, ml_per_trigger=1)
         self.powder_dispenser = Dispenser("Powder", capacity=1000, ml_per_trigger=1)
         self.cooking_time = 120  # in seconds
-        self.current_temp = 83  # in °C
-        self.tolerance = 1.5  # in °C
+        self.current_temp = 80
         self.noodle_made = 0
 
     def make_noodle(self):
@@ -159,8 +171,8 @@ class NoodleMachine:
         print("Noodle Dispensed.")
         time.sleep(2)
 
-        print("Cooking and Maintaining Temperature at 83°C...")
-        self.cooking_process.run_with_temparature_control()
+        print("Cooking and Maintaining Temperature at 80°C...")
+        self.cooking_process.run_with_temperature_control()
         time.sleep(1)
                 
         print ("Dispense Seasonings...")

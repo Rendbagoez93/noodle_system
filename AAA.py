@@ -37,3 +37,41 @@ class Robot:
             self.y -= 1
         # try to harvest at new position
         self.harvest()
+        
+        
+        
+class CookingProcess:   
+    def __init__(self, cooking_time):
+        self.cooking_time = cooking_time
+        self.current_temp = 80
+        self.maintain_temp = 80
+
+    def run_with_temparature_control(self):
+        elapsed = 0
+        print("Starting Cooking Process...")
+        while elapsed < self.cooking_time:
+            elapsed += 10
+            print (f"Cooking... {self.cooking_time - elapsed}s remaining.")
+            
+            if self.current_temp < self.maintain_temp:
+                self.current_temp += 2.5
+                print(f"Low Temperature. Heat Up. Current Temp: {self.current_temp}°C")
+            elif self.current_temp > self.maintain_temp:
+                self.current_temp -= 2.5
+                print(f"High Temperature. Cool Down. Current Temp: {self.current_temp}°C")
+            else:
+                print(f"Stable Temperature. Current Temp: {self.current_temp}°C")
+            
+            time.sleep(2)
+            
+        return "Cooking Process Completed."
+    
+    def run(self):
+        elapsed = 0
+        print("Starting Cooking Process...")
+        while elapsed < self.cooking_time:
+            elapsed += 10
+            print(f"Cooking... {self.cooking_time - elapsed}s remaining.")
+            time.sleep(2)
+        return "Cooking Process Completed."
+    
