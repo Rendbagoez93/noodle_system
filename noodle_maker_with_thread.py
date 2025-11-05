@@ -128,6 +128,9 @@ class CookingProcess:
             time.sleep(1)  
 
     def run_with_temperature_control(self):
+        self.cooking_active = threading.Thread(target=self.run)
+        self.cooking_active.start()
+        
         temp_thread = threading.Thread(target=self.maintain_temperature)
         temp_thread.daemon = True
         temp_thread.start()
