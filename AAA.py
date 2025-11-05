@@ -1,77 +1,69 @@
-class Robot:
-    """Simple robot that moves toward nearest wheat and harvests it."""
-    def __init__(self, farm_map, start_x=0, start_y=0):
-        self.farm = farm_map
-        self.x = start_x
-        self.y = start_y
-        self.harvested = 0
+import time
+import threading
 
-    def harvest(self):
-        if self.farm.remove_wheat(self.x, self.y):
-            self.harvested += 1
-            print(f"Harvested at ({self.x}, {self.y}) -> total harvested: {self.harvested}")
 
-    def find_nearest_wheat(self):
-        nearest = None
-        min_dist = None
-        for y in range(self.farm.size):
-            for x in range(self.farm.size):
-                if self.farm.get_cell(x, y) == 1:
-                    dist = abs(self.x - x) + abs(self.y - y)
-                    if min_dist is None or dist < min_dist:
-                        min_dist = dist
-                        nearest = (x, y)
-        return nearest
-
-    def step_towards(self, tx, ty):
-        if tx is None:
-            return
-        # move one step in x or y toward target
-        if self.x < tx:
-            self.x += 1
-        elif self.x > tx:
-            self.x -= 1
-        elif self.y < ty:
-            self.y += 1
-        elif self.y > ty:
-            self.y -= 1
-        # try to harvest at new position
-        self.harvest()
-        
-        
-        
-class CookingProcess:   
-    def __init__(self, cooking_time):
-        self.cooking_time = cooking_time
-        self.current_temp = 80
-        self.maintain_temp = 80
-
-    def run_with_temparature_control(self):
-        elapsed = 0
-        print("Starting Cooking Process...")
-        while elapsed < self.cooking_time:
-            elapsed += 10
-            print (f"Cooking... {self.cooking_time - elapsed}s remaining.")
-            
-            if self.current_temp < self.maintain_temp:
-                self.current_temp += 2.5
-                print(f"Low Temperature. Heat Up. Current Temp: {self.current_temp}°C")
-            elif self.current_temp > self.maintain_temp:
-                self.current_temp -= 2.5
-                print(f"High Temperature. Cool Down. Current Temp: {self.current_temp}°C")
-            else:
-                print(f"Stable Temperature. Current Temp: {self.current_temp}°C")
-            
-            time.sleep(2)
-            
-        return "Cooking Process Completed."
+def heat_up(current_temp, target_temp, heating_rate=5):
+    while current_temp < target_temp:
+        time.sleep(2)
+        current_temp += heating_rate
+        print(f"Heating... Current Temperature: {current_temp}°C")
+    print("Target temperature reached!")
     
-    def run(self):
-        elapsed = 0
-        print("Starting Cooking Process...")
-        while elapsed < self.cooking_time:
-            elapsed += 10
-            print(f"Cooking... {self.cooking_time - elapsed}s remaining.")
-            time.sleep(2)
-        return "Cooking Process Completed."
+def maintain_temperature(current_temp, target_temp, duration=100):
+    print("Maintaining temperature...")
+    while duration > 0:
+        if current_temp < target_temp:
+            current_temp += 2  # small heating to maintain temp
+        elif current_temp > target_temp:
+            current_temp -= 2  # cooling down to maintain temp
+        
+        duration -= 10
+        print(f"Current Temperature: {current_temp}°C, Time left: {duration} seconds")
+        time.sleep(2)
+    print("Finished maintaining temperature.")
     
+def cooking(current_temp, cooking_time=120):
+    if current_temp <= 75:
+        print("Temperature good for cooking!")
+        return
+    
+    print("Cooking started...")
+    while cooking_time > 0:
+        cooking_time -= 10
+        print(f"Cooking... Time left: {cooking_time} seconds")
+        
+        time.sleep(2)
+    
+    print("Cooking completed!")
+
+worker_1 = threading.Thread(target=heat_up, args=(20, 75))
+worker_1 = threading.Thread(target=maintain_temperature, args=(75, 75, 100), daemon=True)
+worker_2 = threading.Thread(target=cooking, args=(80, 120))
+
+worker_1.start()
+worker_1.join()
+worker_2.start()
+
+
+print("All processes completed.")
+
+# # Simulate heating and cooking process using threading
+# def main():
+#     initial_temp = 20
+#     target_temp = 75
+#     cooking_temp = 80
+#     cooking_duration = 120  # seconds
+
+#     heating_thread = threading.Thread(target=heat_up, args=(initial_temp, target_temp), daemon=True)
+#     cooking_thread = threading.Thread(target=cooking, args=(cooking_temp, cooking_duration))
+
+#     heating_thread.start()
+#     heating_thread.join()  # Ensure heating is done before cooking starts
+
+#     cooking_thread.start()
+#     cooking_thread.join()
+
+#     print("All processes completed.")
+    
+# cooking_process = main
+# print(cooking_process)
