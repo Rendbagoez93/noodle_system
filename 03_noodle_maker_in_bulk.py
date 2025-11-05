@@ -1,137 +1,5 @@
 import time
 
-# Instant Noodles Maker Machine
-
-# Task 1.1
-
-capacity = 500
-flow_rate = 100 # per second
-
-def open_water_valve(Seconds):
-    total_water = flow_rate * Seconds
-    if total_water > capacity:
-        total_water = capacity
-    return int(total_water)
-
-# print(open_water_valve(5))
-# print("=" * 20)
-
-# Task 1.2
-temperature = 0 - 100
-
-def is_temperature_ok(current_temp):
-    if current_temp >= 75 and current_temp <= 80:
-        return True
-    else:
-        return False
-
-# print(is_temperature_ok(78))
-# print(is_temperature_ok(70))
-# print("=" * 20)
-
-# Task 1.3
-
-ketchup = 1 # ml per trigger
-sausage = 1
-powder = 1
-
-# Recipe
-right_ketchup = 3
-right_sausage = 2
-right_powder = 3
-
-def add_seasoning(ketchup_ml, sausage_ml, powder_ml):
-    if ketchup_ml == right_ketchup and sausage_ml == right_sausage and powder_ml == right_powder:
-        return True
-    else:
-        return False
-    
-# print(add_seasoning(3, 2, 3))
-# print(add_seasoning(2, 2, 3))
-# print("=" * 20)
-
-# Task 2.1
-
-def fill_bucket(target_amount):
-    total_filled = 0
-    seconds = 0
-    while total_filled < target_amount:
-        total_filled += open_water_valve(1)
-        seconds += 1
-    return seconds
-
-seconds = fill_bucket(600)
-# print(f"Need {seconds} seconds to fill the bucket.")
-# print("=" * 20)
-
-# Task 2.2
-
-def heat_water(current_temp, target_temp):
-    if current_temp >= target_temp:
-        return 0
-    temp_difference = target_temp - current_temp
-    seconds_needed = temp_difference / 5
-    return int(seconds_needed)
-    
-seconds = heat_water(70, 80)
-# print(f"Need {seconds} seconds to heat from 70°C to 80°C")
-# print("=" * 20)
-
-# Task 2.3
-
-min_temp = 75
-max_temp = 80
-
-def maintain_temp(current_temp, target_temp):
-    if current_temp < min_temp:
-        return "INCREASE"
-    elif current_temp > max_temp:
-        return "DECREASE"
-    else:
-        return "MAINTAIN"
-
-# print(maintain_temp(75, 80))
-# print(maintain_temp(85, 77))  
-# print(maintain_temp(65, 80))
-# print("=" * 20)
-
-# Task 2.4
-
-cooking_time = 120 # in seconds
-
-def cook_noodles(cooking_time):
-    if cooking_time >= 120:
-        return "READY"
-    if cooking_time <= 120:
-        return "COOKING"
-
-# print(cook_noodles(130))
-# print(cook_noodles(100))
-# print("=" * 20)
-
-# Task 2.5
-
-ketchup = 1 # ml per trigger
-sausage = 1
-powder = 1
-
-def dispense_all_seasonings():
-    right_ketchup = 3 * ketchup
-    right_sausage = 2 * sausage
-    right_powder = 3 * powder
-    
-    result = {
-        "ketchup" : right_ketchup, 
-        "sausage" : right_sausage, 
-        "powder" : right_powder
-    }
-    return result 
-
-# print(dispense_all_seasonings())
-# print ("=" * 20)
-
-# Task 3.1
-
 class WaterSystem:
     def __init__(self):
         self.max_capacity_in_tank = 5000
@@ -201,61 +69,20 @@ class Dispenser:
         self.capacity = capacity
         self.ml_per_trigger = ml_per_trigger
         self.current_amount = capacity
-       
-    def dispense_noodles(self, times=1):
-        for i in range(times):
-            if self.current_amount < self.ml_per_trigger:
-                print(f"Error: Not enough noodles in {self.name} dispenser! Needed {self.ml_per_trigger} ml for trigger {i+1}, available {self.current_amount} ml")
-                return False
-            self.current_amount -= self.ml_per_trigger
-            print(f"Trigger {i+1}: Dispensed {self.ml_per_trigger} ml from {self.name} Dispenser. Remaining: {self.current_amount} ml")
-            time.sleep(1)
-
-    def dispense_ketchup(self, times=1):
-        for i in range(times):
-            if self.current_amount < self.ml_per_trigger:
-                print(f"Error: Not enough ketchup in {self.name} dispenser! Needed {self.ml_per_trigger} ml for trigger {i+1}, available {self.current_amount} ml")
-                return False
-            self.current_amount -= self.ml_per_trigger
-            print(f"Trigger {i+1}: Dispensed {self.ml_per_trigger} ml from {self.name} Dispenser. Remaining: {self.current_amount} ml")
-            time.sleep(1)
-
-    def dispense_sausage(self, times=1):
-        for i in range(times):
-            if self.current_amount < self.ml_per_trigger:
-                print(f"Error: Not enough sausage in {self.name} dispenser! Needed {self.ml_per_trigger} ml for trigger {i+1}, available {self.current_amount} ml")
-                return False
-            self.current_amount -= self.ml_per_trigger
-            print(f"Trigger {i+1}: Dispensed {self.ml_per_trigger} ml from {self.name} Dispenser. Remaining: {self.current_amount} ml")
-            time.sleep(1)
-            
-    def dispense_powder(self, times=1):
-        for i in range(times):
-            if self.current_amount < self.ml_per_trigger:
-                print(f"Error: Not enough powder in {self.name} dispenser! Needed {self.ml_per_trigger} ml for trigger {i+1}, available {self.current_amount} ml")
-                return False
-            self.current_amount -= self.ml_per_trigger
-            print(f"Trigger {i+1}: Dispensed {self.ml_per_trigger} ml from {self.name} Dispenser. Remaining: {self.current_amount} ml")
-            time.sleep(1)
-
+    
+    def trigger(self, times=1):
+        amount = times * self.ml_per_trigger
+        if amount > self.current_amount:
+            print(f"Error: Not enough {self.name} in dispenser!")
+            return False
+        self.current_amount -= amount
+        print(f"Dispensing {amount} ml from {self.name} Dispenser.")
+        return True
+        
     def get_dispenser_status(self):
         return f"{self.name}: {self.current_amount}/{self.capacity} ml remaining"
-
-# noodle = Dispenser("Noodle", 500, 1)
-# ketchup = Dispenser("Ketchup", 1000, 1)
-# sausage = Dispenser("Sausage", 1000, 1)
-# powder = Dispenser("Powder", 1000, 1)
-# print(noodle.dispense_noodles(1))
-# print(ketchup.dispense_ketchup(3))
-# print(sausage.dispense_sausage(2))
-# print(powder.dispense_powder(3))
-# print(noodle.get_dispenser_status())
-# print(ketchup.get_dispenser_status())
-# print(sausage.get_dispenser_status())
-# print(powder.get_dispenser_status())
-print("=" * 20)
-
-class CookingProcess:
+    
+class CookingProcess:   
     def __init__(self, cooking_time, maintain_temp=83, initial_temp=80, min_temp=75, max_temp=90, tolerance=1.5):
         self.cooking_time = cooking_time
         self.current_temp = initial_temp
@@ -264,7 +91,7 @@ class CookingProcess:
         self.max_temp = max_temp
         self.tolerance = tolerance
 
-    def run_with_temperature_control(self):  # Fixed type
+    def run_with_temperature_control(self):  # Fixed typo
         elapsed = 0
         print("Starting Cooking Process...")
         while elapsed < self.cooking_time:
@@ -316,9 +143,10 @@ class NoodleMachine:
         
         time.sleep(1)
         print("\n4. Dispensing Noodle...")
-        (self.noodle_dispenser.dispense_noodles(1))
-        (self.noodle_dispenser.get_dispenser_status())
-
+        if not self.noodle_dispenser.trigger(1):
+            print("Failed to dispense noodles!")
+            return False
+            
         time.sleep(2)
         print("Noodle Dispensed.")
 
@@ -328,22 +156,15 @@ class NoodleMachine:
         time.sleep(1)
                 
         print("\n6. Dispensing Seasonings...")
-        self.ketchup_dispenser.dispense_ketchup(3)
-        (self.ketchup_dispenser.get_dispenser_status())
-        
-        time.sleep(2)
-        self.sausage_dispenser.dispense_sausage(2)
-        (self.sausage_dispenser.get_dispenser_status())
-
-        time.sleep(2)
-        self.powder_dispenser.dispense_powder(3)
-        (self.powder_dispenser.get_dispenser_status())
-
-        time.sleep(2)
+        self.ketchup_dispenser.trigger(3)
+        time.sleep(1)
+        self.sausage_dispenser.trigger(2)
+        time.sleep(1)
+        self.powder_dispenser.trigger(3)
+        time.sleep(1)
 
         print("\n7. Mixing Noodles...")
         time.sleep(3)
-        
         print("Noodles are ready!")
         self.noodle_made += 1
         print(f"Total noodles made: {self.noodle_made}")
